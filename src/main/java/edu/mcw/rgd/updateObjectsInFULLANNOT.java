@@ -1,8 +1,11 @@
 package edu.mcw.rgd;
-import edu.mcw.rgd.dao.DataSourceFactory;
+
+import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.process.Utils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.core.io.FileSystemResource;
 
 import java.sql.*;
 import java.util.HashSet;
@@ -15,11 +18,17 @@ import java.util.Set;
  */
 public class updateObjectsInFULLANNOT {
 
-    Log log = LogFactory.getLog("updates");
+    Logger log = Logger.getLogger("updates");
+    AbstractDAO dao = new AbstractDAO();
+
+    private String version;
+    private int lastModifiedBy;
 
     public static void main(String[] args) throws Exception {
 
-        updateObjectsInFULLANNOT instance = new updateObjectsInFULLANNOT();
+        DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
+        new XmlBeanDefinitionReader(bf).loadBeanDefinitions(new FileSystemResource("properties/AppConfigure.xml"));
+        updateObjectsInFULLANNOT instance = (updateObjectsInFULLANNOT) (bf.getBean("manager"));
 
         try {
             instance.run();
@@ -31,24 +40,27 @@ public class updateObjectsInFULLANNOT {
 
     public void run() throws Exception {
 
-        Connection connection = DataSourceFactory.getInstance().getDataSource().getConnection();
-        log.info("updateGeneNamesInFULLANNOT v. 1.2.3, built on May 2, 2017");
+        long time0 = System.currentTimeMillis();
 
-        Statement stmt = connection.createStatement(
-                                      ResultSet.TYPE_SCROLL_INSENSITIVE,
-                                      ResultSet.CONCUR_UPDATABLE);
-        String updateQuery = "UPDATE FULL_ANNOT SET OBJECT_SYMBOL=?,OBJECT_NAME=?,LAST_MODIFIED_DATE=SYSDATE,LAST_MODIFIED_BY=170 WHERE FULL_ANNOT_KEY=?";
-        PreparedStatement psUpdate = connection.prepareStatement(updateQuery);
+        log.info(getVersion());
+        log.info("   "+dao.getConnectionInfo());
+        log.info("=======");
 
-        updateGenes(stmt, psUpdate);
-        updateStrains(stmt, psUpdate);
-        updateQtls(stmt, psUpdate);
-        updateVariants(stmt, psUpdate);
+        Statement stmt = dao.getConnection().createStatement();
 
-        connection.close();
+        updateGenes(stmt);
+        updateStrains(stmt);
+        updateQtls(stmt);
+        updateVariants(stmt);
+
+        stmt.close();
+
+        log.info("");
+        log.info("=== OK ===  elapsed  "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+        log.info("");
     }
 
-    void updateGenes(Statement stmt, PreparedStatement psUpdate) throws Exception {
+    void updateGenes(Statement stmt) throws Exception {
 
         ResultSet rs = stmt.executeQuery(
                 "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.GENE_SYMBOL object_symbol2, g.FULL_NAME object_name2 "+
@@ -56,12 +68,12 @@ public class updateObjectsInFULLANNOT {
                 "WHERE f.RGD_OBJECT_KEY=1 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.GENE_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.FULL_NAME,'*')))");
 
-        updateObjects("GENES", rs, psUpdate);
+        updateObjects("GENES", rs);
 
         rs.close();
     }
 
-    void updateStrains(Statement stmt, PreparedStatement psUpdate) throws Exception {
+    void updateStrains(Statement stmt) throws Exception {
 
         ResultSet rs = stmt.executeQuery(
                 "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, s.STRAIN_SYMBOL object_symbol2, s.FULL_NAME object_name2 "+
@@ -69,12 +81,12 @@ public class updateObjectsInFULLANNOT {
                 "WHERE f.RGD_OBJECT_KEY=5 AND f.ANNOTATED_OBJECT_RGD_ID = s.RGD_ID "+
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(s.STRAIN_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(s.FULL_NAME,'*')))");
 
-        updateObjects("STRAINS", rs, psUpdate);
+        updateObjects("STRAINS", rs);
 
         rs.close();
     }
 
-    void updateQtls(Statement stmt, PreparedStatement psUpdate) throws Exception {
+    void updateQtls(Statement stmt) throws Exception {
 
         ResultSet rs = stmt.executeQuery(
                 "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, q.QTL_SYMBOL object_symbol2, q.QTL_NAME object_name2 "+
@@ -82,12 +94,12 @@ public class updateObjectsInFULLANNOT {
                 "WHERE f.RGD_OBJECT_KEY=6 AND f.ANNOTATED_OBJECT_RGD_ID = q.RGD_ID "+
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(q.QTL_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(q.QTL_NAME,'*')))");
 
-        updateObjects("QTLS", rs, psUpdate);
+        updateObjects("QTLS", rs);
 
         rs.close();
     }
 
-    void updateVariants(Statement stmt, PreparedStatement psUpdate) throws Exception {
+    void updateVariants(Statement stmt) throws Exception {
 
         ResultSet rs = stmt.executeQuery(
                 "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2 "+
@@ -95,12 +107,12 @@ public class updateObjectsInFULLANNOT {
                 "WHERE f.RGD_OBJECT_KEY=7 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
 
-        updateObjects("VARIANTS", rs, psUpdate);
+        updateObjects("VARIANTS", rs);
 
         rs.close();
     }
 
-    void updateObjects(String objType, ResultSet rs, PreparedStatement psUpdate) throws Exception {
+    void updateObjects(String objType, ResultSet rs) throws Exception {
 
         log.info("");
         log.info("Starting update for "+objType);
@@ -132,15 +144,33 @@ public class updateObjectsInFULLANNOT {
             }
 
             if( symbolChanged || nameChanged ){
-                psUpdate.setString(1, objSymbol);
-                psUpdate.setString(2, objName);
-                psUpdate.setInt(3, fullAnnotKey);
-                psUpdate.executeUpdate();
+                update(objSymbol, objName, fullAnnotKey);
             }
         }
 
         log.info("=======");
         log.info(symbolsChanged + " Symbol Updates for "+objectsWithChangedSymbols.size()+ " "+objType);
         log.info(namesChanged + " Name Updates for "+objectsWithChangedNames.size()+ " "+objType);
+    }
+
+    void update(String objectSymbol, String objectName, int fullAnnotKey) throws Exception {
+        String sql = "UPDATE full_annot SET object_symbol=?,object_name=?,last_modified_date=SYSDATE,last_modified_by=? WHERE full_annot_key=?";
+        dao.update(sql, objectSymbol, objectName, getLastModifiedBy(), fullAnnotKey);
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public int getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(int lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 }

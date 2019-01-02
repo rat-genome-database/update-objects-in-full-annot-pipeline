@@ -1,7 +1,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
 <beans>
-    <!-- TO DO -->
+    <bean id="manager" class="edu.mcw.rgd.updateObjectsInFULLANNOT">
+        <property name="version" value="Update Objects In FULLANNOT pipeline v. 1.3.0,  build Jan 2, 2019" />
+        <property name="lastModifiedBy" value="170"/>
+    </bean>
 </beans>
-
-
