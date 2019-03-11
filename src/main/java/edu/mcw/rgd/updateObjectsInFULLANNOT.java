@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Program to update OBJECT_SYMBOL(gene symbol) and OBJECT_NAME(gene name) in the FULL_ANNOT table
- * for all genes, strains, qtls and variants which have the same ANNOTATED_OBJECT_RGD_ID
+ * for all genes, strains, qtls and clinvar variants which have the same ANNOTATED_OBJECT_RGD_ID
  * with the RGD_ID field in the GENES table.
  */
 public class updateObjectsInFULLANNOT {
@@ -107,7 +107,7 @@ public class updateObjectsInFULLANNOT {
                 "WHERE f.RGD_OBJECT_KEY=7 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
 
-        updateObjects("VARIANTS", rs);
+        updateObjects("CLINVAR VARIANTS", rs);
 
         rs.close();
     }
@@ -148,9 +148,8 @@ public class updateObjectsInFULLANNOT {
             }
         }
 
-        log.info("=======");
-        log.info(symbolsChanged + " Symbol Updates for "+objectsWithChangedSymbols.size()+ " "+objType);
-        log.info(namesChanged + " Name Updates for "+objectsWithChangedNames.size()+ " "+objType);
+        log.info("    "+symbolsChanged + " Symbol Updates for "+objectsWithChangedSymbols.size()+ " "+objType);
+        log.info("    "+namesChanged + " Name Updates for "+objectsWithChangedNames.size()+ " "+objType);
     }
 
     void update(String objectSymbol, String objectName, int fullAnnotKey) throws Exception {
