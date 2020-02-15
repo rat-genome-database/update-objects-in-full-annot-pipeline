@@ -8,8 +8,8 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Program to update OBJECT_SYMBOL(gene symbol) and OBJECT_NAME(gene name) in the FULL_ANNOT table
@@ -44,6 +44,10 @@ public class updateObjectsInFULLANNOT {
 
         log.info(getVersion());
         log.info("   "+dao.getConnectionInfo());
+        log.info(getVersion());
+        log.info("   "+dao.getConnectionInfo());
+        SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        log.info("   started at "+sdt.format(new java.util.Date(time0)));
         log.info("=======");
 
         Statement stmt = dao.getConnection().createStatement();
