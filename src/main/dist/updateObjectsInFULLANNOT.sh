@@ -13,4 +13,4 @@ fi
 cd $APPDIR
 $APPDIR/_run.sh 
 
-mailx -s "[$SERVER] Update Object Name Symbol in FULL_ANNOT table" $ELIST < $APPDIR/log/summary.log
+mailx -s "[$SERVER] Update Object Name Symbol in FULL_ANNOT table" $ELIST < $APPDIR/logs/summary.log
