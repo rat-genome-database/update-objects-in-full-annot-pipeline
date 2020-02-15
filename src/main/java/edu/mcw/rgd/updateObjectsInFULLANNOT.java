@@ -44,8 +44,6 @@ public class updateObjectsInFULLANNOT {
 
         log.info(getVersion());
         log.info("   "+dao.getConnectionInfo());
-        log.info(getVersion());
-        log.info("   "+dao.getConnectionInfo());
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         log.info("   started at "+sdt.format(new java.util.Date(time0)));
         log.info("=======");
