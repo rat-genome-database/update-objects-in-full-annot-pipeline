@@ -54,6 +54,7 @@ public class updateObjectsInFULLANNOT {
         updateStrains(stmt);
         updateQtls(stmt);
         updateVariants(stmt);
+        updateCellLines(stmt);
 
         stmt.close();
 
@@ -110,6 +111,19 @@ public class updateObjectsInFULLANNOT {
                   "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
 
         updateObjects("CLINVAR VARIANTS", rs);
+
+        rs.close();
+    }
+
+    void updateCellLines(Statement stmt) throws Exception {
+
+        ResultSet rs = stmt.executeQuery(
+                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2 "+
+                        "FROM FULL_ANNOT f, GENOMIC_ELEMENTS g "+
+                        "WHERE f.RGD_OBJECT_KEY=11 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
+                        "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
+
+        updateObjects("CELL LINES", rs);
 
         rs.close();
     }
