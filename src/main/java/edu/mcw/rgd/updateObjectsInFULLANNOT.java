@@ -35,6 +35,7 @@ public class updateObjectsInFULLANNOT {
         } catch(Exception e) {
             e.printStackTrace();
             Utils.printStackTrace(e, instance.log);
+            throw e;
         }
     }
 
@@ -164,8 +165,8 @@ public class updateObjectsInFULLANNOT {
             }
         }
 
-        log.info("    "+symbolsChanged + " Symbol Updates for "+objectsWithChangedSymbols.size()+ " "+objType);
-        log.info("    "+namesChanged + " Name Updates for "+objectsWithChangedNames.size()+ " "+objType);
+        log.info("    "+Utils.formatThousands(symbolsChanged) + " Symbol Updates for "+Utils.formatThousands(objectsWithChangedSymbols.size())+ " "+objType);
+        log.info("    "+Utils.formatThousands(namesChanged) + " Name Updates for "+Utils.formatThousands(objectsWithChangedNames.size())+ " "+objType);
     }
 
     void update(String objectSymbol, String objectName, int fullAnnotKey) throws Exception {
