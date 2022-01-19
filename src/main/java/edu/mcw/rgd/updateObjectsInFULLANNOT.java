@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
@@ -18,7 +19,7 @@ import java.util.*;
  */
 public class updateObjectsInFULLANNOT {
 
-    Logger log = Logger.getLogger("updates");
+    Logger log = LogManager.getLogger("status");
     AbstractDAO dao = new AbstractDAO();
 
     private String version;
@@ -33,7 +34,6 @@ public class updateObjectsInFULLANNOT {
         try {
             instance.run();
         } catch(Exception e) {
-            e.printStackTrace();
             Utils.printStackTrace(e, instance.log);
             throw e;
         }
