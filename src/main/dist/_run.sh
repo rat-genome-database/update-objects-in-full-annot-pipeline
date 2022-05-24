@@ -2,7 +2,7 @@
 #
 #
 . /etc/profile
-APPNAME=updateObjectsInFULLANNOT
+APPNAME="update-objects-in-full-annot-pipeline"
 
 APPDIR=/home/rgddata/pipelines/$APPNAME
 cd $APPDIR
