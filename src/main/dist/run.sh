@@ -2,7 +2,9 @@
 #   which have the same RGD_ID with the ones in the GENES/STRAINS/QTLS/VARIANTS tables
 #
 . /etc/profile
-APPDIR=/home/rgddata/pipelines/updateObjectsInFULLANNOT
+APPNAME="update-objects-in-full-annot-pipeline"
+
+APPDIR=/home/rgddata/pipelines/$APPNAME
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 
 ELIST=mtutaj@mcw.edu
