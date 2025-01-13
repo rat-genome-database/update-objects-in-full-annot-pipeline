@@ -66,11 +66,12 @@ public class updateObjectsInFULLANNOT {
 
     void updateGenes(Statement stmt) throws Exception {
 
-        ResultSet rs = stmt.executeQuery(
-                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.GENE_SYMBOL object_symbol2, g.FULL_NAME object_name2 "+
-                "FROM FULL_ANNOT f, GENES g "+
-                "WHERE f.RGD_OBJECT_KEY=1 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
-                  "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.GENE_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.FULL_NAME,'*')))");
+        ResultSet rs = stmt.executeQuery("""
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.GENE_SYMBOL object_symbol2, g.FULL_NAME object_name2
+            FROM FULL_ANNOT f, GENES g
+            WHERE f.RGD_OBJECT_KEY=1 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.GENE_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.FULL_NAME,'*')))
+            """);
 
         updateObjects("GENES", rs);
 
@@ -79,11 +80,12 @@ public class updateObjectsInFULLANNOT {
 
     void updateStrains(Statement stmt) throws Exception {
 
-        ResultSet rs = stmt.executeQuery(
-                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, s.STRAIN_SYMBOL object_symbol2, s.FULL_NAME object_name2 "+
-                "FROM FULL_ANNOT f, STRAINS s "+
-                "WHERE f.RGD_OBJECT_KEY=5 AND f.ANNOTATED_OBJECT_RGD_ID = s.RGD_ID "+
-                  "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(s.STRAIN_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(s.FULL_NAME,'*')))");
+        ResultSet rs = stmt.executeQuery("""
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, s.STRAIN_SYMBOL object_symbol2, s.FULL_NAME object_name2
+            FROM FULL_ANNOT f, STRAINS s
+            WHERE f.RGD_OBJECT_KEY=5 AND f.ANNOTATED_OBJECT_RGD_ID = s.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(s.STRAIN_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(s.FULL_NAME,'*')))
+            """);
 
         updateObjects("STRAINS", rs);
 
@@ -92,11 +94,12 @@ public class updateObjectsInFULLANNOT {
 
     void updateQtls(Statement stmt) throws Exception {
 
-        ResultSet rs = stmt.executeQuery(
-                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, q.QTL_SYMBOL object_symbol2, q.QTL_NAME object_name2 "+
-                "FROM FULL_ANNOT f, QTLS q "+
-                "WHERE f.RGD_OBJECT_KEY=6 AND f.ANNOTATED_OBJECT_RGD_ID = q.RGD_ID "+
-                  "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(q.QTL_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(q.QTL_NAME,'*')))");
+        ResultSet rs = stmt.executeQuery("""
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, q.QTL_SYMBOL object_symbol2, q.QTL_NAME object_name2
+            FROM FULL_ANNOT f, QTLS q
+            WHERE f.RGD_OBJECT_KEY=6 AND f.ANNOTATED_OBJECT_RGD_ID = q.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(q.QTL_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(q.QTL_NAME,'*')))
+            """);
 
         updateObjects("QTLS", rs);
 
@@ -105,11 +108,12 @@ public class updateObjectsInFULLANNOT {
 
     void updateVariants(Statement stmt) throws Exception {
 
-        ResultSet rs = stmt.executeQuery(
-                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2 "+
-                "FROM FULL_ANNOT f, GENOMIC_ELEMENTS g "+
-                "WHERE f.RGD_OBJECT_KEY=7 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
-                  "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
+        ResultSet rs = stmt.executeQuery("""
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2
+            FROM FULL_ANNOT f, GENOMIC_ELEMENTS g
+            WHERE f.RGD_OBJECT_KEY=7 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))
+            """);
 
         updateObjects("CLINVAR VARIANTS", rs);
 
@@ -118,11 +122,12 @@ public class updateObjectsInFULLANNOT {
 
     void updateCellLines(Statement stmt) throws Exception {
 
-        ResultSet rs = stmt.executeQuery(
-                "SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2 "+
-                        "FROM FULL_ANNOT f, GENOMIC_ELEMENTS g "+
-                        "WHERE f.RGD_OBJECT_KEY=11 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID "+
-                        "AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))");
+        ResultSet rs = stmt.executeQuery("""
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2
+            FROM FULL_ANNOT f, GENOMIC_ELEMENTS g
+            WHERE f.RGD_OBJECT_KEY=11 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))
+            """);
 
         updateObjects("CELL LINES", rs);
 

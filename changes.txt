@@ -1,3 +1,6 @@
+Jan 13, 2025
+  rewrote sql queries to use java text blocks
+
 Jul 30, 2024
   updated to java 17
 
