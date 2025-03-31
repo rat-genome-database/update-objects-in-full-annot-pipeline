@@ -1,3 +1,6 @@
+Mar 31, 2025
+  updated dependencies
+
 Jan 13, 2025
   rewrote sql queries to use java text blocks
 
