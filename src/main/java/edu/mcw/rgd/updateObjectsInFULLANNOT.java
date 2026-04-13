@@ -1,6 +1,7 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.dao.AbstractDAO;
+import edu.mcw.rgd.process.MemoryMonitor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,9 @@ public class updateObjectsInFULLANNOT {
 
         long time0 = System.currentTimeMillis();
 
+        MemoryMonitor memoryMonitor = new MemoryMonitor();
+        memoryMonitor.start();
+
         log.info(getVersion());
         log.info("   "+dao.getConnectionInfo());
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -59,6 +63,8 @@ public class updateObjectsInFULLANNOT {
 
         stmt.close();
 
+        memoryMonitor.stop();
+        log.info(memoryMonitor.getSummary());
         log.info("");
         log.info("=== OK ===  elapsed  "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
         log.info("");
