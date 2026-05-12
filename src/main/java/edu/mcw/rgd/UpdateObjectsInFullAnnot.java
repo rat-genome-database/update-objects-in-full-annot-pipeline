@@ -18,7 +18,7 @@ import java.util.*;
  * for all genes, strains, qtls and clinvar variants which have the same ANNOTATED_OBJECT_RGD_ID
  * with the RGD_ID field in the GENES table.
  */
-public class updateObjectsInFULLANNOT {
+public class UpdateObjectsInFullAnnot {
 
     Logger log = LogManager.getLogger("status");
     AbstractDAO dao = new AbstractDAO();
@@ -30,7 +30,7 @@ public class updateObjectsInFULLANNOT {
 
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         new XmlBeanDefinitionReader(bf).loadBeanDefinitions(new FileSystemResource("properties/AppConfigure.xml"));
-        updateObjectsInFULLANNOT instance = (updateObjectsInFULLANNOT) (bf.getBean("manager"));
+        UpdateObjectsInFullAnnot instance = (UpdateObjectsInFullAnnot) (bf.getBean("manager"));
 
         try {
             instance.run();
