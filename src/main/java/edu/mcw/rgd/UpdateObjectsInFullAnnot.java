@@ -53,15 +53,20 @@ public class UpdateObjectsInFullAnnot {
         log.info("   started at "+sdt.format(new java.util.Date(time0)));
         log.info("=======");
 
-        Statement stmt = dao.getConnection().createStatement();
+        List<ObjType> objTypes = List.of(
+                new ObjType("GENES",            1,  "GENES",            "GENE_SYMBOL",   "FULL_NAME"),
+                new ObjType("STRAINS",          5,  "STRAINS",          "STRAIN_SYMBOL", "FULL_NAME"),
+                new ObjType("QTLS",             6,  "QTLS",             "QTL_SYMBOL",    "QTL_NAME"),
+                new ObjType("CLINVAR VARIANTS", 7,  "GENOMIC_ELEMENTS", "SYMBOL",        "NAME"),
+                new ObjType("CELL LINES",       11, "GENOMIC_ELEMENTS", "SYMBOL",        "NAME")
+        );
 
-        updateGenes(stmt);
-        updateStrains(stmt);
-        updateQtls(stmt);
-        updateVariants(stmt);
-        updateCellLines(stmt);
-
-        stmt.close();
+        try( Connection conn = dao.getConnection();
+             Statement stmt = conn.createStatement() ) {
+            for( ObjType t: objTypes ) {
+                updateObjectType(stmt, t);
+            }
+        }
 
         memoryMonitor.stop();
         log.info(memoryMonitor.getSummary());
@@ -70,74 +75,23 @@ public class UpdateObjectsInFullAnnot {
         log.info("");
     }
 
-    void updateGenes(Statement stmt) throws Exception {
+    /** an object type whose FULL_ANNOT symbol/name is resynced from its source table */
+    record ObjType(String label, int objectKey, String table, String symbolCol, String nameCol) {}
 
-        ResultSet rs = stmt.executeQuery("""
-            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.GENE_SYMBOL object_symbol2, g.FULL_NAME object_name2
-            FROM FULL_ANNOT f, GENES g
-            WHERE f.RGD_OBJECT_KEY=1 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.GENE_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.FULL_NAME,'*')))
-            """);
+    void updateObjectType(Statement stmt, ObjType t) throws Exception {
 
-        updateObjects("GENES", rs);
+        // table/column names come from the hardcoded list in run(), not from user input
+        String sql = """
+            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY,
+                   o.%s object_symbol2, o.%s object_name2
+            FROM FULL_ANNOT f, %s o
+            WHERE f.RGD_OBJECT_KEY=%d AND f.ANNOTATED_OBJECT_RGD_ID = o.RGD_ID
+              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(o.%s,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(o.%s,'*')))
+            """.formatted(t.symbolCol(), t.nameCol(), t.table(), t.objectKey(), t.symbolCol(), t.nameCol());
 
-        rs.close();
-    }
-
-    void updateStrains(Statement stmt) throws Exception {
-
-        ResultSet rs = stmt.executeQuery("""
-            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, s.STRAIN_SYMBOL object_symbol2, s.FULL_NAME object_name2
-            FROM FULL_ANNOT f, STRAINS s
-            WHERE f.RGD_OBJECT_KEY=5 AND f.ANNOTATED_OBJECT_RGD_ID = s.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(s.STRAIN_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(s.FULL_NAME,'*')))
-            """);
-
-        updateObjects("STRAINS", rs);
-
-        rs.close();
-    }
-
-    void updateQtls(Statement stmt) throws Exception {
-
-        ResultSet rs = stmt.executeQuery("""
-            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, q.QTL_SYMBOL object_symbol2, q.QTL_NAME object_name2
-            FROM FULL_ANNOT f, QTLS q
-            WHERE f.RGD_OBJECT_KEY=6 AND f.ANNOTATED_OBJECT_RGD_ID = q.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(q.QTL_SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(q.QTL_NAME,'*')))
-            """);
-
-        updateObjects("QTLS", rs);
-
-        rs.close();
-    }
-
-    void updateVariants(Statement stmt) throws Exception {
-
-        ResultSet rs = stmt.executeQuery("""
-            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2
-            FROM FULL_ANNOT f, GENOMIC_ELEMENTS g
-            WHERE f.RGD_OBJECT_KEY=7 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))
-            """);
-
-        updateObjects("CLINVAR VARIANTS", rs);
-
-        rs.close();
-    }
-
-    void updateCellLines(Statement stmt) throws Exception {
-
-        ResultSet rs = stmt.executeQuery("""
-            SELECT f.OBJECT_SYMBOL, f.OBJECT_NAME, f.ANNOTATED_OBJECT_RGD_ID, f.FULL_ANNOT_KEY, g.SYMBOL object_symbol2, g.NAME object_name2
-            FROM FULL_ANNOT f, GENOMIC_ELEMENTS g
-            WHERE f.RGD_OBJECT_KEY=11 AND f.ANNOTATED_OBJECT_RGD_ID = g.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(g.SYMBOL,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(g.NAME,'*')))
-            """);
-
-        updateObjects("CELL LINES", rs);
-
-        rs.close();
+        try( ResultSet rs = stmt.executeQuery(sql) ) {
+            updateObjects(t.label(), rs);
+        }
     }
 
     void updateObjects(String objType, ResultSet rs) throws Exception {
