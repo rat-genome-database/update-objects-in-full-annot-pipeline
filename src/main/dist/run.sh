@@ -1,5 +1,5 @@
-# Program to update gene/strain/qtl/variant NAMEs and SYMBOLs in FULL_ANNOT table
-#   which have the same RGD_ID with the ones in the GENES/STRAINS/QTLS/VARIANTS tables
+# Program to update gene/strain/qtl/clinvar-variant/cell-line NAMEs and SYMBOLs in FULL_ANNOT table
+#   to match the ones in the GENES/STRAINS/QTLS/GENOMIC_ELEMENTS tables
 #
 . /etc/profile
 APPNAME="update-objects-in-full-annot-pipeline"

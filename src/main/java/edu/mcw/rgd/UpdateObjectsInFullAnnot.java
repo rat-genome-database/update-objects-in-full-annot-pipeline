@@ -101,8 +101,8 @@ public class UpdateObjectsInFullAnnot {
 
         int namesChanged = 0;
         int symbolsChanged = 0;
-        Set<Integer> objectsWithChangedNames = new HashSet<Integer>();
-        Set<Integer> objectsWithChangedSymbols = new HashSet<Integer>();
+        Set<Integer> objectsWithChangedNames = new HashSet<>();
+        Set<Integer> objectsWithChangedSymbols = new HashSet<>();
 
         while (rs.next()) {
             String fullAnnotSymbol=rs.getString("OBJECT_SYMBOL");
@@ -125,9 +125,8 @@ public class UpdateObjectsInFullAnnot {
                 objectsWithChangedNames.add(objRGDID);
             }
 
-            if( symbolChanged || nameChanged ){
-                update(objSymbol, objName, fullAnnotKey);
-            }
+            // the SELECT returns only mismatched rows, so every row needs an update
+            update(objSymbol, objName, fullAnnotKey);
         }
 
         log.info("    "+Utils.formatThousands(symbolsChanged) + " Symbol Updates for "+Utils.formatThousands(objectsWithChangedSymbols.size())+ " "+objType);

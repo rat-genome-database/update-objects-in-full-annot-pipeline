@@ -1,3 +1,6 @@
+Jun 15, 2026
+  minor cleanups (removed redundant guard, diamond operators); fixed stale run.sh comment; updated dependencies
+
 Jun 9, 2026
   de-duplicated the per-object-type update methods into one parameterized method; fixed JDBC connection leak (try-with-resources); removed unused commons-net dep; updated dependencies
 
