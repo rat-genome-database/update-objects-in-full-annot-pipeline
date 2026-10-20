@@ -1,3 +1,6 @@
+Oct 20, 2026
+  migrated to postgres
+
 Jun 15, 2026
   minor cleanups (removed redundant guard, diamond operators); fixed stale run.sh comment; updated dependencies
 

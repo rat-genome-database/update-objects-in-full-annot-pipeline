@@ -86,7 +86,7 @@ public class UpdateObjectsInFullAnnot {
                    o.%s object_symbol2, o.%s object_name2
             FROM FULL_ANNOT f, %s o
             WHERE f.RGD_OBJECT_KEY=%d AND f.ANNOTATED_OBJECT_RGD_ID = o.RGD_ID
-              AND (NVL(f.OBJECT_SYMBOL,'*')<>NVL(o.%s,'*') OR (NVL(f.OBJECT_NAME,'*')<>NVL(o.%s,'*')))
+              AND (COALESCE(f.OBJECT_SYMBOL,'')<>COALESCE(o.%s,'') OR (COALESCE(f.OBJECT_NAME,'')<>COALESCE(o.%s,'')))
             """.formatted(t.symbolCol(), t.nameCol(), t.table(), t.objectKey(), t.symbolCol(), t.nameCol());
 
         try( ResultSet rs = stmt.executeQuery(sql) ) {
@@ -112,8 +112,8 @@ public class UpdateObjectsInFullAnnot {
             int objRGDID=rs.getInt("ANNOTATED_OBJECT_RGD_ID");
             int fullAnnotKey=rs.getInt("FULL_ANNOT_KEY");
 
-            boolean symbolChanged = !Utils.stringsAreEqual(fullAnnotSymbol, objSymbol);
-            boolean nameChanged = !Utils.stringsAreEqual(fullAnnotName, objName);
+            boolean symbolChanged = !Utils.defaultString(fullAnnotSymbol).equals(Utils.defaultString(objSymbol));
+            boolean nameChanged = !Utils.defaultString(fullAnnotName).equals(Utils.defaultString(objName));
             if( symbolChanged ) {
                 log.debug("SYMBOL FASym=[" + fullAnnotSymbol+"] "+objType+"Sym=[" + objSymbol+"] FAKey="+fullAnnotKey+" RGDID=" + objRGDID);
                 symbolsChanged++;
@@ -134,7 +134,7 @@ public class UpdateObjectsInFullAnnot {
     }
 
     void update(String objectSymbol, String objectName, int fullAnnotKey) throws Exception {
-        String sql = "UPDATE full_annot SET object_symbol=?,object_name=?,last_modified_date=SYSDATE,last_modified_by=? WHERE full_annot_key=?";
+        String sql = "UPDATE full_annot SET object_symbol=?,object_name=?,last_modified_date=CURRENT_TIMESTAMP,last_modified_by=? WHERE full_annot_key=?";
         dao.update(sql, objectSymbol, objectName, getLastModifiedBy(), fullAnnotKey);
     }
 
