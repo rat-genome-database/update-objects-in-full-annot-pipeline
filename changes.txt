@@ -1,3 +1,6 @@
+Nov 20, 2026
+  FULL_ANNOT updates sent in JDBC batches; run.sh: failed runs flagged in the email subject
+
 Jun 15, 2026
   minor cleanups (removed redundant guard, diamond operators); fixed stale run.sh comment; updated dependencies
 
