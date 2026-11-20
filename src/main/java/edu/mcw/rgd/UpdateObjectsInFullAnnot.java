@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.object.BatchSqlUpdate;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -104,6 +105,12 @@ public class UpdateObjectsInFullAnnot {
         Set<Integer> objectsWithChangedNames = new HashSet<>();
         Set<Integer> objectsWithChangedSymbols = new HashSet<>();
 
+        // updates are sent in JDBC batches (auto-flushed every 5000 rows by BatchSqlUpdate), not one round trip per row
+        BatchSqlUpdate su = new BatchSqlUpdate(dao.getDataSource(),
+                "UPDATE full_annot SET object_symbol=?,object_name=?,last_modified_date=CURRENT_TIMESTAMP,last_modified_by=? WHERE full_annot_key=?",
+                new int[]{Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER});
+        su.compile();
+
         while (rs.next()) {
             String fullAnnotSymbol=rs.getString("OBJECT_SYMBOL");
             String objSymbol=rs.getString("OBJECT_SYMBOL2");
@@ -126,16 +133,13 @@ public class UpdateObjectsInFullAnnot {
             }
 
             // the SELECT returns only mismatched rows, so every row needs an update
-            update(objSymbol, objName, fullAnnotKey);
+            su.update(objSymbol, objName, getLastModifiedBy(), fullAnnotKey);
         }
+        int rowsUpdated = dao.executeBatch(su);
 
+        log.info("    "+Utils.formatThousands(rowsUpdated) + " FULL_ANNOT rows updated for "+objType);
         log.info("    "+Utils.formatThousands(symbolsChanged) + " Symbol Updates for "+Utils.formatThousands(objectsWithChangedSymbols.size())+ " "+objType);
         log.info("    "+Utils.formatThousands(namesChanged) + " Name Updates for "+Utils.formatThousands(objectsWithChangedNames.size())+ " "+objType);
-    }
-
-    void update(String objectSymbol, String objectName, int fullAnnotKey) throws Exception {
-        String sql = "UPDATE full_annot SET object_symbol=?,object_name=?,last_modified_date=CURRENT_TIMESTAMP,last_modified_by=? WHERE full_annot_key=?";
-        dao.update(sql, objectSymbol, objectName, getLastModifiedBy(), fullAnnotKey);
     }
 
     public String getVersion() {

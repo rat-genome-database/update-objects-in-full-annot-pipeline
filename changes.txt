@@ -1,3 +1,6 @@
+Nov 20, 2026
+  FULL_ANNOT updates sent in JDBC batches; run.sh: failed runs flagged in the email subject
+
 Oct 20, 2026
   migrated to postgres
 
